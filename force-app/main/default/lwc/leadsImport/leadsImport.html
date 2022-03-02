@@ -1,0 +1,110 @@
+<template>
+    <div class="slds-text-align_right">
+        <lightning-button 
+            label="Importar Leads com planilha" 
+            title="Importar Leads com planilha" 
+            onclick={handleShowModal} 
+            class="slds-m-right_x-small">
+        </lightning-button>
+    </div>
+    
+    <template if:true={showModal}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={handleCloseModal}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Importar mútiplos leads</h2>
+                </header>
+
+                <div class="slds-modal__content" id="modal-content-id-1">
+                    <div class="slds-is-relative">
+
+                        <template if:true={isLoading}>
+                            <lightning-spinner variant="brand" alternative-text="Loading" size="large"></lightning-spinner>
+                        </template>
+                        
+                        
+                        <template if:false={uploadRealizado}>
+
+                            <lightning-layout horizontal-align="space">                                
+                                <lightning-layout-item padding="around-large">
+                                    <div class="slds-text-heading_small slds-text-align_left">Passo 1</div>                                  
+                                </lightning-layout-item>
+                                <lightning-layout-item padding="around-large">
+                                    <div class="slds-text-heading_small slds-text-align_left">Passo 2</div>
+                                </lightning-layout-item>
+                                <lightning-layout-item padding="around-large">
+                                </lightning-layout-item>
+                            </lightning-layout>
+                            
+                            <lightning-layout horizontal-align="center" class="slds-theme_shade">
+                                
+                                <lightning-layout-item padding="around-large" class="slds-text-align_center" style="padding-bottom: 3rem;">
+                                    <div class="slds-text-heading_small slds-text-align_center slds-p-top_x-large slds-p-bottom_x-large"> <strong>Se você ainda não baixou o <br> modelo...</strong> <br><br><br> Clique no botão a seguir para <br> baixar o arquivo modelo da <br> planilha NovosLeads:</div>
+                                    <a href={leadsImportTemplate}>
+                                        <lightning-button 
+                                            label="Fazer download" 
+                                            title="Fazer download" 
+                                            icon-name="utility:download">
+                                        </lightning-button>
+                                    </a>
+                                </lightning-layout-item>
+                                
+                                <lightning-layout-item padding="around-large">
+                                    <div class="slds-text-heading_small slds-text-align_center" style="margin-top: 6rem;">- ou -</div>
+                                </lightning-layout-item>
+                                
+                                <lightning-layout-item padding="around-large" class="slds-text-align_center" style="padding-bottom: 3rem;">
+                                    <div class="slds-text-heading_small slds-p-top_x-large slds-p-bottom_medium"> <strong> Se você já possui o arquivo modelo preenchido com <br> os seus novos leads...</strong> <br><br><br> Certifique-se de que o mesmo esteja salvo no <br> formato .csv, selecione-o do seu dispositivo ou <br> arraste-o para cá:</div>
+                                    <lightning-file-upload
+                                        name="fileUploader" 
+                                        accept={acceptedFormats} 
+                                        onuploadfinished={handleUploadFinished}>
+                                    </lightning-file-upload>
+                                </lightning-layout-item>
+                                
+                            </lightning-layout>
+                        </template>
+                    
+                        <template if:true={uploadRealizado}>                           
+
+                            <div class="slds-theme_shade slds-p-around_large">
+                                <div class="slds-text-heading_small slds-p-vertical_medium">O arquivo a seguir foi carregado com sucesso:</div>
+                                <div class="slds-text-body_regular slds-p-vertical_medium">
+                                    <lightning-icon size="xx-small" icon-name="action:approval" alternative-text="Approved" title="Approved" class="slds-m-right_medium"></lightning-icon>
+                                    <strong>{uploadedFileName}</strong> <lightning-button label="Novo upload" title="Novo upload" onclick={handleNewUpload} class="slds-m-left_small"></lightning-button>
+                                </div>
+                            </div>
+
+                            <div class="slds-p-around_large">
+                                <div class="slds-text-heading_small slds-p-bottom_medium">Prévia de upload: <lightning-helptext class="slds-m-left_small" content="É possível pré-visualizar até 10 linhas do arquivos carregado. Faça um novo upload caso as informações estejam incorretas."></lightning-helptext></div>
+                                <div style="overflow-y: auto; max-height: 250px">
+                                    <lightning-datatable
+                                        key-field="id"
+                                        columns={columns}
+                                        data={leadsView}
+                                        hide-checkbox-column>
+                                    </lightning-datatable>
+                                </div>
+                            </div>
+                            
+                        </template>            
+                    </div>
+                </div>
+
+                <footer class="slds-modal__footer">
+                    <lightning-button variant="neutral" class="slds-p-right_small" label="Cancelar" onclick={handleCloseModal}></lightning-button>
+                    <lightning-button if:true={uploadRealizado} variant="brand" label="Concluir upload" onclick={insertLeads}></lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>
